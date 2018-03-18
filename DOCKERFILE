@@ -1,0 +1,30 @@
+FROM dhyanb/server-jre:8u162
+LABEL maintainer="Dhyan Blum <dhyanb@gmail.com>" \
+      description="A Payara Micro image based on minimal versions of Debian Stretch and Oracle Server JRE 8"
+
+ENV PAYARA_HOME=/opt/payara \
+    PAYARA_USER=payara \
+    PAYARA_GROUP=payara \
+    PAYARA_PASS=payara \
+	PAYARA_JAR_URL=https://s3-eu-west-1.amazonaws.com/payara.fish/Payara+Downloads/Payara+4.1.2.181/payara-micro-4.1.2.181.jar \
+    PAYARA_JAR_NAME=payara-micro.jar
+
+RUN mkdir --parents $PAYARA_HOME/deployments && \
+	useradd --user-group --home-dir $PAYARA_HOME $PAYARA_USER && \
+	echo $PAYARA_USER:$PAYARA_PASS | chpasswd && \
+	chown --recursive $PAYARA_USER:$PAYARA_GROUP $PAYARA_HOME && \
+    curl --output $PAYARA_HOME/$PAYARA_JAR_NAME --silent $PAYARA_JAR_URL
+
+ENV DEPLOY_DIR=$PAYARA_HOME/deployments \
+    AUTODEPLOY_DIR=$DEPLOY_DIR \
+    PAYARA_MICRO_JAR=$PAYARA_HOME/$PAYARA_JAR_NAME
+
+# Default payara ports to expose
+EXPOSE 4848 8009 8080 8181
+
+USER payara
+WORKDIR $PAYARA_HOME
+
+# Unfortunately you cannot use ENV variables in ENTRYPOINT or CMD
+ENTRYPOINT ["java", "-jar", "/opt/payara/payara-micro.jar"]
+CMD ["--deploymentDir", "/opt/payara/deployments"]
