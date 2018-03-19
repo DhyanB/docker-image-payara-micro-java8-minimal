@@ -1,4 +1,4 @@
-FROM dhyanb/server-jre:8u162
+FROM dhyanb/docker-server-jre:8u162
 LABEL maintainer="Dhyan Blum <dhyanb@gmail.com>" \
       description="A Payara Micro image based on minimal versions of Debian Stretch and Oracle Server JRE 8"
 
